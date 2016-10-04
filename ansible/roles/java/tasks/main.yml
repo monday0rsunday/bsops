@@ -1,0 +1,3 @@
+---
+- name: install JDK 8
+  script: install_java.sh

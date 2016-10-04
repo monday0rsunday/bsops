@@ -1,0 +1,29 @@
+---
+- name: Install required softwares
+  hosts: frontend_servers
+  remote_user: root
+
+  roles:
+    - common
+    - java
+    - erlang
+    - jetty
+    - redis
+    - riak
+    - rabbit-mq
+    - nginx
+    - solr
+    - zookeeper
+
+- name: Install required softwares for web servers
+  hosts: frontend_servers
+
+  tasks:
+    - name: ensure apache is latest version
+      yum: name=httpd state=latest
+    - name: ensure apache is running (even when rebooting)
+      service: name=httpd state=started enabled=true
+
+  handlers:
+    - name: restart apache
+      service: name=httpd state=restarted

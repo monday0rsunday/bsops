@@ -1,0 +1,5 @@
+[frontend_servers]
+anyquiz.info	ansible_user=root
+
+[backend_servers]
+anyquiz.info	ansible_user=root
