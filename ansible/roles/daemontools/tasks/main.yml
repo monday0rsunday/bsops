@@ -1,0 +1,6 @@
+---
+# TODO move buidling software to Docker
+- name: Download daemontools
+  command: curl https://cr.yp.to/daemontools/daemontools-0.76.tar.gz > /tmp/daemontools-0.76.tar.gz && tar -zxvf /tmp/daemontools-0.76.tar.gz- C /tmp
+- name: Build daemontools
+  command: cd /tmp/admin/daemontools-0.76 && ./package/install
