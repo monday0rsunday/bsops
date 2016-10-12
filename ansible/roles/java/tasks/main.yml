@@ -1,3 +1,11 @@
 ---
-- name: install JDK 8
+
+- name: Check precondiction - java_version
+  fail: msg="ERROR - required variable 'java_version' missing"
+  when: java_version is undefined
+
+- name: Download JDK
+  
+
+- name: Install JDK
   script: install_java.sh

@@ -1,6 +1,40 @@
 ---
-# TODO move buidling software to Docker
+# TODO move buidling softwares to Docker
+
+- name: Check precondition - daemontools_version
+  fail: msg="ERROR - required variable 'daemontools_version' missing"
+  when: daemontools_version is undefined
+
 - name: Download daemontools
-  command: curl https://cr.yp.to/daemontools/daemontools-0.76.tar.gz > /tmp/daemontools-0.76.tar.gz && tar -zxvf /tmp/daemontools-0.76.tar.gz- C /tmp
+  get_url: 
+    url: https://cr.yp.to/daemontools/daemontools-{{ daemontools_version }}.tar.gz
+    dest: /tmp/daemontools-{{ daemontools_version }}.tar.gz
+
+- name: Extract daemontools
+  # this module require gtar/unzip
+  # unarchive:
+  #   src: /tmp/daemontools-{{ daemontools_version }}.tar.gz
+  #   dest: /tmp
+  command: tar -zxvf /tmp/daemontools-{{ daemontools_version }}.tar.gz -C /tmp
+
+- name: Fix daemontools building problem, see http://jamesreubenknowles.com/centos5-daemontools-143
+  replace:
+    dest: /tmp/admin/daemontools-{{ daemontools_version }}/src/conf-cc
+    regexp: '^(gcc.*)$'
+    replace: '\1 -include /usr/include/errno.h'
+
+- name: Copy daemontools to persistent directory
+  # I don't known why it doesn't work
+  # copy:
+  #   src: /tmp/admin/daemontools-{{ daemontools_version }}
+  #   dest: /opt/
+  command: cp -r /tmp/admin/daemontools-{{ daemontools_version }} /opt/
+
+- name: Clear daemontools tmp files
+  file: path={{ item.tmp }} state=absent
+  with_items:
+    - {tmp: "/tmp/daemontools-{{ daemontools_version }}.tar.gz"}
+    - {tmp: "/tmp/admin"}
+
 - name: Build daemontools
-  command: cd /tmp/admin/daemontools-0.76 && ./package/install
+  command: chdir=/opt/daemontools-{{ daemontools_version }} package/install

@@ -1,8 +1,11 @@
 ---
 - name: Install required softwares
   hosts: vagrant
-  remote_user: root
+  become: true
+  become_method: sudo
 
   roles:
     - daemontools
 
+  vars:
+    daemontools_version: 0.76
