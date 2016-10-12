@@ -1,0 +1,11 @@
+---
+
+- name: Copy repo file - Debian based distro
+  template: src=nginx.list.j2 dest=/etc/apt/sources.list.d/nginx.list
+
+- name: Authenticate nginx repository - Debian based distro
+  # shell: curl -k https://nginx.org/keys/nginx_signing.key | /usr/bin/apt-key add -
+  apt_key: url=https://nginx.org/keys/nginx_signing.key state=present
+
+- name: Update package manager - Debian based distro
+  apt: update_cache=yes

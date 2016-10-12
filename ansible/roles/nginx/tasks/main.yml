@@ -1,0 +1,12 @@
+---
+
+- name: Update repositories - Debian based distro
+  include: update_debian.yml
+  when: ansible_pkg_mgr == "apt" and (ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian')
+
+- name: Update repositories - Redhat based distro
+  include: update_redhat.yml
+  when: ansible_pkg_mgr == "yum" and ansible_os_family == 'RedHat'
+
+- name: Install nginx
+  package: name=nginx state=latest

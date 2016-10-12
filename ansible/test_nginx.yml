@@ -1,0 +1,12 @@
+---
+- name: Test nginx role
+  hosts: vagrant
+  become: true
+  become_method: sudo
+
+  roles:
+    - nginx
+
+  vars:
+    nginx_version: 1.8.1
+    nginx_dir: /usr/local/nginx
