@@ -1,0 +1,20 @@
+---
+
+# This role install Erlang from Erlang Solutions.
+# See at https://www.erlang-solutions.com/resources/download.html
+
+- name: Check precondition - erlang_version
+  fail: msg="ERROR - required variable 'erlang_version' missing"
+  when: erlang_version is undefined
+
+- name: Install Erlang from Erlang Solutions
+  apt:
+    deb: https://packages.erlang-solutions.com/erlang/esl-erlang/FLAVOUR_1_general/esl-erlang_{{ erlang_version }}-1~{{ ansible_distribution|lower}}~{{ansible_distribution_release|lower}}_amd64.deb
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install Erlang from Erlang Solutions
+  apt:
+    deb: https://packages.erlang-solutions.com/erlang/esl-erlang/FLAVOUR_1_general/esl-erlang_{{ erlang_version }}-1~{{ ansible_distribution|lower}}~{{ansible_distribution_version|lower}}_amd64.deb
+    state: present
+  when: ansible_os_family == "RedHat"

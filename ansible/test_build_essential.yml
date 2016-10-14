@@ -1,0 +1,8 @@
+---
+- name: Test build-essential role
+  hosts: vagrant
+  become: true
+  become_method: sudo
+
+  roles:
+    - build-essential

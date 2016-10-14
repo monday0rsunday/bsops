@@ -1,0 +1,9 @@
+---
+
+- name: Install Debian based essential softwares
+  include: debian.yml
+  when: ansible_pkg_mgr == "apt" and (ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian')
+
+- name: Install RedHat based essential softwares
+  include: redhat.yml
+  when: ansible_pkg_mgr == "yum" and ansible_os_family == "RedHat"

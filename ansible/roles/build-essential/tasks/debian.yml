@@ -1,0 +1,15 @@
+---
+
+- name: Update aptitude
+  apt: update_cache=yes
+
+- name: Install build-essential, autoconf, etc.
+  apt: name={{ item }} state=present
+  with_items:
+    - autoconf
+    - binutils-doc
+    - bison
+    - build-essential
+    - flex
+    - gettext
+    - ncurses-dev
