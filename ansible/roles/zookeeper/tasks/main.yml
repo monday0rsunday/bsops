@@ -1,0 +1,25 @@
+---
+
+- name: Check precondiction - zk_version
+  fail: msg="ERROR - missing variable zk_version"
+  when: zk_version is undefined
+
+- name: Create group zookeeper
+  group: name={{ zk_group }} gid={{ zk_gid }} state=present
+
+- name: Create user zookeeper
+  user: name="{{ zk_user }}" uid="{{ zk_uid }}" group="{{ zk_group }}" state=present
+
+- name: Check downloaded Zookeeper
+  stat: path=/tmp/zookeeper-{{ zk_version }}.tar.gz
+  register: zk_downloaded
+
+- name: Download Zookeeper
+  get_url:
+    url: https://archive.apache.org/dist/zookeeper/zookeeper-{{ zk_version }}/zookeeper-{{ zk_version }}.tar.gz
+    dest: /tmp/zookeeper-{{ zk_version }}.tar.gz
+  when: not zk_downloaded.stat.exists
+
+- name: Extract Zookeeper
+  unarchive:
+    src=/tmp/zookeeper-{{ zk_version }}.tar.gz dest={{ zk_dir }} owner={{ zk_user }} group={{ zk_group }}

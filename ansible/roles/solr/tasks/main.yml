@@ -1,0 +1,38 @@
+---
+
+- name: Check precondiction - solr_version
+  fail: msg="ERROR - variable 'solr_version' is missing"
+  when: solr_version is undefined
+
+- name: Check precondiction - solr_dir
+  fail: msg="ERROR - variable 'solr_dir' is missing"
+  when: solr_dir is undefined
+
+- name: Create group solr
+  group: name={{ solr_group }} gid={{ solr_gid }} state=present
+
+- name: Create user solr
+  user: name="{{ solr_user }}" uid="{{ solr_uid }}" group="{{ solr_group }}" state=present
+
+- name: Check Solr downloaded
+  stat: path=/tmp/solr-{{ solr_version }}.zip
+  register: solr_downloaded
+
+- name: Download Solr
+  get_url:
+    url: http://archive.apache.org/dist/lucene/solr/{{ solr_version }}/solr-{{ solr_version }}.zip
+    dest: /tmp/solr-{{ solr_version }}.zip
+  when: not solr_downloaded.stat.exists
+
+- name: Ensure unzip installed
+  package: name=unzip state=present
+
+- name: Extract Solr
+  # unarchive: remote_src=yes src="/tmp/solr-{{ solr_version }}.zip" dest="{{ solr_dir }}" owner={{ solr_user }} group={{ solr_group }}
+  shell: unzip /tmp/solr-{{ solr_version }}.zip -d {{ solr_dir }} && chown -R {{ solr_user }}.{{ solr_group }} {{ solr_dir }}/solr-{{ solr_version }}
+  args:
+    removes: "/tmp/solr-{{ solr_version }}.zip"
+    creates: "{{ solr_dir }}/solr-{{ solr_version }}"
+
+- name: Link Solr
+  file: src={{ solr_dir }}/solr-{{ solr_version }} dest={{ solr_dir }}/solr state=link owner={{ solr_user }} group={{ solr_group }}

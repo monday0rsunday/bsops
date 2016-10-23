@@ -1,0 +1,13 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.hostname = "bsops"
+  config.vm.network :private_network, ip: "192.168.100.101"
+  config.vm.provider :virtualbox do |vm|
+    vm.name = "bsops"
+    vm.customize ["modifyvm", :id, "--memory", "1024"]
+    vm.cpus = 2
+  end
+end

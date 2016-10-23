@@ -1,0 +1,16 @@
+---
+- name: Test solr role
+  hosts: vagrant
+  become: true
+  become_method: sudo
+
+  roles:
+    - solr
+
+  vars:
+    solr_version: 6.0.0
+    solr_dir: /usr/local
+    solr_uid: 2001
+    solr_gid: 2001
+    solr_user: solr
+    solr_group: solr
