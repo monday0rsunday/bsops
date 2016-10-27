@@ -8,7 +8,7 @@
   group: name={{ zk_group }} gid={{ zk_gid }} state=present
 
 - name: Create user zookeeper
-  user: name="{{ zk_user }}" uid="{{ zk_uid }}" group="{{ zk_group }}" state=present
+  user: name="{{ zk_user }}" uid="{{ zk_uid }}" group="{{ zk_group }}" shell=/bin/bash state=present
 
 - name: Check downloaded Zookeeper
   stat: path=/tmp/zookeeper-{{ zk_version }}.tar.gz
@@ -21,5 +21,6 @@
   when: not zk_downloaded.stat.exists
 
 - name: Extract Zookeeper
-  unarchive:
-    src=/tmp/zookeeper-{{ zk_version }}.tar.gz dest={{ zk_dir }} owner={{ zk_user }} group={{ zk_group }}
+  shell: tar -zxvf /tmp/zookeeper-{{ zk_version }}.tar.gz -C {{ zk_dir }}/ && chown -R {{ zk_user }}.{{ zk_group }} {{ zk_dir }}/zookeeper-{{ zk_version }}
+  args:
+    removes: "/tmp/zookeeper-{{ zk_version }}.tar.gz"

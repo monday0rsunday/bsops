@@ -1,0 +1,16 @@
+---
+- name: Test rabbitmq role
+  hosts: vagrant
+  become: true
+  become_method: sudo
+
+  roles:
+    - rabbitmq
+
+  vars:
+    rbmq_version: 3.6.2
+    rbmq_dir: /usr/local
+    rbmq_uid: 2003
+    rbmq_gid: 2003
+    rbmq_user: rabbitmq
+    rbmq_group: rabbitmq

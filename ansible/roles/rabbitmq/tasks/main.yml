@@ -1,0 +1,26 @@
+---
+
+- name: Check precondiction - rbmq_version
+  fail: msg="ERROR - missing variable rbmq_version"
+  when: rbmq_version is undefined
+
+- name: Create group rabbitmq
+  group: name={{ rbmq_group }} gid={{ rbmq_gid }} state=present
+
+- name: Create user rabbitmq
+  user: name="{{ rbmq_user }}" uid="{{ rbmq_uid }}" group="{{ rbmq_group }}" shell=/bin/bash state=present
+
+- name: Check downloaded rabbitmq
+  stat: path=/tmp/rabbitmq-server-generic-unix-{{ rbmq_version }}.tar.xz
+  register: rbmq_downloaded
+
+- name: Download rabbitmq
+  get_url:
+    url: https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v{{ rbmq_version|replace(".", "_") }}/rabbitmq-server-generic-unix-{{ rbmq_version }}.tar.xz
+    dest: /tmp/rabbitmq-server-generic-unix-{{ rbmq_version }}.tar.xz
+  when: not rbmq_downloaded.stat.exists
+
+- name: Extract rabbitmq
+  shell: tar -Jxvf /tmp/rabbitmq-server-generic-unix-{{ rbmq_version }}.tar.xz -C {{ rbmq_dir }}/ && chown -R {{ rbmq_user }}.{{ rbmq_group }} {{ rbmq_dir }}/rabbitmq_server-{{ rbmq_version }}
+  args:
+    removes: "/tmp/rabbitmq-server-generic-unix-{{ rbmq_version }}.tar.xz"

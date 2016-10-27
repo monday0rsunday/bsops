@@ -12,7 +12,7 @@
   group: name={{ solr_group }} gid={{ solr_gid }} state=present
 
 - name: Create user solr
-  user: name="{{ solr_user }}" uid="{{ solr_uid }}" group="{{ solr_group }}" state=present
+  user: name="{{ solr_user }}" uid="{{ solr_uid }}" group="{{ solr_group }}" shell=/bin/bash state=present
 
 - name: Check Solr downloaded
   stat: path=/tmp/solr-{{ solr_version }}.zip
