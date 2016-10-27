@@ -1,0 +1,16 @@
+---
+- name: Test jetty role
+  hosts: vagrant
+  become: true
+  become_method: sudo
+
+  roles:
+    - jetty
+
+  vars:
+    jetty_version: 9.3.13.v20161014
+    jetty_dir: /usr/local
+    jetty_uid: 2004
+    jetty_gid: 2004
+    jetty_user: jetty
+    jetty_group: jetty

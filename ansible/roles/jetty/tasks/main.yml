@@ -1,0 +1,26 @@
+---
+
+- name: Check precondiction - jetty_version
+  fail: msg="ERROR - missing variable jetty_version"
+  when: jetty_version is undefined
+
+- name: Create group jetty
+  group: name={{ jetty_group }} gid={{ jetty_gid }} state=present
+
+- name: Create user jetty
+  user: name="{{ jetty_user }}" uid="{{ jetty_uid }}" group="{{ jetty_group }}" shell=/bin/bash state=present
+
+- name: Check downloaded jetty
+  stat: path=/tmp/jetty-distribution-{{ jetty_version }}.zip
+  register: jetty_downloaded
+
+- name: Download jetty
+  get_url:
+    url: http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/{{ jetty_version }}/jetty-distribution-{{ jetty_version }}.zip
+    dest: /tmp/jetty-distribution-{{ jetty_version }}.zip
+  when: not jetty_downloaded.stat.exists
+
+- name: Extract jetty
+  shell: unzip /tmp/jetty-distribution-{{ jetty_version }}.zip -d {{ jetty_dir }}/ && chown -R {{ jetty_user }}.{{ jetty_group }} {{ jetty_dir }}/jetty-distribution-{{ jetty_version }}
+  args:
+    removes: "/tmp/jetty-distribution-{{ jetty_version }}.zip"
