@@ -1,11 +1,22 @@
 ---
 
-- name: Check precondiction - java_version
-  fail: msg="ERROR - required variable 'java_version' missing"
-  when: java_version is undefined
+- name: Check precondiction - jdk_version
+  fail: msg="ERROR - required variable 'jdk_version' missing"
+  when: jdk_version is undefined
 
-- name: Download JDK
-  
+- name: Check precondiction - jdk_build_version
+  fail: msg="ERROR - required variable 'jdk_build_version' missing"
+  when: jdk_build_version is undefined
 
-- name: Install JDK
-  script: install_java.sh
+- name: Check precondiction - jdk_full_version
+  fail: msg="ERROR - required variable 'jdk_full_version' missing"
+  when: jdk_full_version is undefined
+
+
+- name: Install JDK - Debian based distro
+  include: install_debian.yml
+  when: ansible_pkg_mgr == "apt" and (ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian')
+
+- name: Install JDK - Redhat based distro
+  include: install_redhat.yml
+  when: ansible_pkg_mgr == "yum" and ansible_os_family == "RedHat"

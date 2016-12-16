@@ -1,0 +1,14 @@
+---
+- name: Test java role
+  hosts: vagrant
+  become: true
+  become_method: sudo
+
+  roles:
+    - java
+
+  vars:
+    jdk_version: 8u112
+    jdk_build_version: b15
+    jdk_full_version: 1.8.0_112
+    jdk_dir: /usr/local

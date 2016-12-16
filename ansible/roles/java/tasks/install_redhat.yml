@@ -1,0 +1,18 @@
+---
+# See https://www.digitalocean.com/community/tutorials/how-to-install-java-on-centos-and-fedora
+
+- name: Check downloaded JDK
+  stat: path=/tmp/jdk-{{ jdk_version }}-linux-x64.rpm
+  register: jdk_downloaded
+
+- name: Download JDK
+  get_url: 
+    url: http://download.oracle.com/otn-pub/java/jdk/{{ jdk_version }}-{{ jdk_build_version }}/jdk-{{ jdk_version }}-linux-x64.rpm
+    dest: /tmp/jdk-{{ jdk_version }}-linux-x64.rpm
+    headers: 'Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie'
+  when: not jdk_downloaded.stat.exists
+
+- name: Install JDK
+  yum:
+    name: /tmp/jdk-{{ jetty_version }}-linux-x64.rpm
+    state: present
