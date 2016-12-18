@@ -15,8 +15,10 @@
 
 - name: Install JDK - Debian based distro
   include: install_debian.yml
+  static: no
   when: ansible_pkg_mgr == "apt" and (ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian')
 
 - name: Install JDK - Redhat based distro
   include: install_redhat.yml
+  static: no
   when: ansible_pkg_mgr == "yum" and ansible_os_family == "RedHat"

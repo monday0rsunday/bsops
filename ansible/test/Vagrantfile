@@ -1,0 +1,25 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.define "ubuntu.bsops" do |ubuntu|
+    ubuntu.vm.box = "ubuntu/trusty64"
+    ubuntu.vm.hostname = "ubuntu.bsops"
+    ubuntu.vm.network :private_network, ip: "192.168.100.101"
+    ubuntu.vm.provider :virtualbox do |vm|
+      vm.name = "ubuntu.bsops"
+      vm.customize ["modifyvm", :id, "--memory", "1024"]
+      vm.cpus = 1
+    end
+  end
+  config.vm.define "centos.bsops" do |centos|
+    centos.vm.box = "centos/7"
+    centos.vm.hostname = "centos.bsops"
+    centos.vm.network :private_network, ip: "192.168.100.102"
+    centos.vm.provider :virtualbox do |vm|
+      vm.name = "centos.bsops"
+      vm.customize ["modifyvm", :id, "--memory", "1024"]
+      vm.cpus = 1
+    end
+  end
+end
