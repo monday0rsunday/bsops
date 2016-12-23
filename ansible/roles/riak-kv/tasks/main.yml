@@ -1,0 +1,14 @@
+---
+# See http://docs.basho.com/riak/kv/2.1.4/downloads
+
+- name: Install Riak Ubuntu
+  include: install_ubuntu_trusty.yml
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_release == 'trusty'
+
+
+- name: Download Riak CentOS
+  include: install_centos.yml
+  when:
+    - ansible_distribution == 'CentOS'

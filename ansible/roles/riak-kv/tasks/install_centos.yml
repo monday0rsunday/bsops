@@ -1,0 +1,13 @@
+---
+
+- name: Install Riak (CentOS 6)
+  yum:
+    name: http://s3.amazonaws.com/downloads.basho.com/riak/2.1/2.1.4/rhel/6/riak-2.1.4-1.el6.x86_64.rpm
+    state: present
+  when: ansible_distribution_major_version == '6'
+
+- name: Install Riak (CentOS 7)
+  yum:
+    name: http://s3.amazonaws.com/downloads.basho.com/riak/2.1/2.1.4/rhel/7/riak-2.1.4-1.el7.centos.x86_64.rpm
+    state: present
+  when: ansible_distribution_major_version == '7'

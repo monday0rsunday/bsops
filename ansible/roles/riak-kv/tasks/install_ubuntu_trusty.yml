@@ -1,0 +1,6 @@
+---
+
+- name: Install Riak Ubuntu
+  apt:
+    deb: http://s3.amazonaws.com/downloads.basho.com/riak/2.1/2.1.4/ubuntu/precise/riak_2.1.4-2_amd64.deb
+    state: present
