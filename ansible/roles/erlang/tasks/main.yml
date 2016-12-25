@@ -14,7 +14,7 @@
   when: ansible_os_family == "Debian"
 
 - name: Install Erlang from Erlang Solutions
-  apt:
-    deb: https://packages.erlang-solutions.com/erlang/esl-erlang/FLAVOUR_1_general/esl-erlang_{{ erlang_version }}-1~{{ ansible_distribution|lower}}~{{ansible_distribution_version|lower}}_amd64.deb
+  yum:
+    name: https://packages.erlang-solutions.com/erlang/esl-erlang/FLAVOUR_1_general/esl-erlang_{{ erlang_version }}~centos~{{ ansible_distribution_major_version }}_amd64.rpm
     state: present
   when: ansible_os_family == "RedHat"
