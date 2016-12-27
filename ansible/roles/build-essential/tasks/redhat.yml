@@ -1,7 +1,7 @@
 ---
 
-- name: Install "Development Tools"
+- name: Install Development Tools
   yum: name={{ item }} state=present
-  with_item:
+  with_items:
       - "@Development Tools"
       - "epel-release"

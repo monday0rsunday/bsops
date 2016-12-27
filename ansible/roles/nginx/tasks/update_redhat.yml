@@ -4,7 +4,9 @@
   template: src=nginx.repo.j2 dest=/etc/yum.repos.d/nginx.repo
 
 - name: Authenticate nginx repository - RedHat based distro
-  shell: curl -k https://nginx.org/keys/nginx_signing.key | rpm --import -
+  rpm_key:
+    key: https://nginx.org/keys/nginx_signing.key
+    state: present
 
 - name: Update package manager - RedHat based distro
   shell: yum update
