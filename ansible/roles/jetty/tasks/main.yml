@@ -24,3 +24,4 @@
   shell: unzip /tmp/jetty-distribution-{{ jetty_version }}.zip -d {{ jetty_dir }}/ && chown -R {{ jetty_user }}.{{ jetty_group }} {{ jetty_dir }}/jetty-distribution-{{ jetty_version }}
   args:
     removes: "/tmp/jetty-distribution-{{ jetty_version }}.zip"
+    creates: '{{ jetty_dir }}/jetty-distribution-{{ jetty_version }}'
