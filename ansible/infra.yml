@@ -1,5 +1,5 @@
 ---
-- name: Test broship environment
+- name: Setup Broship infrastructure
   hosts: vagrant
   become: true
   become_method: sudo
