@@ -21,6 +21,25 @@
   when: not zk_downloaded.stat.exists
 
 - name: Extract Zookeeper
-  shell: tar -zxvf /tmp/zookeeper-{{ zk_version }}.tar.gz -C {{ zk_dir }}/ && chown -R {{ zk_user }}.{{ zk_group }} {{ zk_dir }}/zookeeper-{{ zk_version }}
+  shell: tar -zxvf /tmp/zookeeper-{{ zk_version }}.tar.gz -C {{ zk_dir }}/
   args:
     removes: "/tmp/zookeeper-{{ zk_version }}.tar.gz"
+
+- name: Create Zookeeper directories
+  file:
+    path: '{{ item }}'
+    state: directory
+    recurse: yes
+    owner: '{{ zk_user }}'
+    group: '{{ zk_group }}'
+  with_items:
+    - '{{ zk_data_dir }}'
+    - '{{ zk_dir }}/zookeeper-{{ zk_version }}'
+
+- name: Configure Zookeeper
+  template:
+    src: zoo.cfg
+    dest: '{{ zk_dir }}/zookeeper-{{ zk_version }}/conf/zoo.cfg'
+    owner: '{{ zk_user }}'
+    group: '{{ zk_group }}'
+    

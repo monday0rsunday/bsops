@@ -1,3 +1,0 @@
-[vagrant]
-test_ubuntu ansible_host=192.168.100.101 ansible_port=22 ansible_user=vagrant ansible_ssh_pass=vagrant
-test_centos ansible_host=192.168.100.102 ansible_port=22 ansible_user=vagrant ansible_ssh_pass=vagrant

@@ -3,7 +3,9 @@
   hosts: vagrant
   become: true
   become_method: sudo
-
+  vars:
+    zk_data_dir: /var/lib/zookeeper
+    zk_port: 2181
   roles:
     - build-essential
     - {role: daemontools, daemontools_version: 0.76}

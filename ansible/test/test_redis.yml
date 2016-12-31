@@ -1,0 +1,13 @@
+---
+
+- name: Test Redis installation
+  hosts: vagrant
+  become: true
+  become_method: sudo
+  vars:
+    - redis_version: 3.2.6
+    - redis_uid: 2005
+    - redis_gid: 2005
+    - redis_build_dir: /tmp
+  roles:
+    - {role: redis}
