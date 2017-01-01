@@ -5,3 +5,6 @@
   with_items:
       - "@Development Tools"
       - "epel-release"
+      - tar
+      - wget
+      - git

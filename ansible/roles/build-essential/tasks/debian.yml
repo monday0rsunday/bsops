@@ -13,3 +13,7 @@
     - flex
     - gettext
     - ncurses-dev
+    - libtool
+    - tar
+    - wget
+    - git
