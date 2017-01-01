@@ -1,0 +1,8 @@
+---
+
+zk_version: 3.4.8
+zk_dir: /usr/local
+zk_uid: 2002
+zk_gid: 2002
+zk_user: zookeeper
+zk_group: zookeeper

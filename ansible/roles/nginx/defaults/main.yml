@@ -1,0 +1,4 @@
+---
+
+nginx_version: 1.8.1
+nginx_dir: /usr/local/nginx

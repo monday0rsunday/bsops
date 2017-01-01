@@ -1,0 +1,6 @@
+---
+
+jdk_version: 8u112
+jdk_build_version: b15
+jdk_full_version: 1.8.0_112
+jdk_dir: /usr/local
