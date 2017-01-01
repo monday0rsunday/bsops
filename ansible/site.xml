@@ -1,6 +1,6 @@
 ---
 - name: Install required softwares
-  hosts: frontend_servers
+  hosts: frontend
   remote_user: root
 
   roles:
@@ -16,7 +16,7 @@
     - zookeeper
 
 - name: Install required softwares for web servers
-  hosts: frontend_servers
+  hosts: frontend
 
   tasks:
     - name: ensure apache is latest version

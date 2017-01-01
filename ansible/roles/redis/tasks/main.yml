@@ -11,15 +11,24 @@
     shell: /bin/bash
     state: present
 
+- name: Check redis
+  stat:
+    path: '{{ redis_home }}/bin/redis-server'
+  register: redis
+
 - name: Unarchive redis
   unarchive:
     src: http://download.redis.io/releases/redis-{{ redis_version }}.tar.gz
     dest: '{{ redis_build_dir }}'
     copy: no
     creates: "{{ redis_build_dir }}/redis-{{ redis_version}}"
+  when: redis.stat.exists == False
 
 - name: Build redis
-  shell: cd {{ redis_build_dir }}/redis-{{ redis_version}} && make distclean && make
+  shell: make distclean && make
+  args:
+    chdir: '{{ redis_build_dir }}/redis-{{ redis_version}}'
+  when: redis.stat.exists == False
 
 - name: Install TCL for testing redis
   yum:
@@ -31,6 +40,7 @@
 
 - name: Install redis
   shell: cd {{ redis_build_dir }}/redis-{{ redis_version}} && make PREFIX={{ redis_home }} install
+  when: redis.stat.exists == False
 
 - name: Create redis conf directory
   file:
@@ -41,7 +51,6 @@
     mode: 0755
   with_items:
     - '{{ redis_conf_dir }}'
-    - '{{ redis_run_dir }}'
 
 - name: Create redis data directories
   file:
@@ -53,9 +62,21 @@
   with_items:
     - '{{ redis_data_dir }}'
     - '{{ redis_log_dir }}'
+    - '{{ redis_run_dir }}'
 
 - name: Configure redis
   template:
     src: redis.conf.j2
-    dest: '{{ redis_conf_dir }}/redis_{{ redis_port }}'
+    dest: '{{ redis_conf_dir }}/redis_{{ redis_port }}.conf'
     mode: 0644
+
+- name: Create redis startup script
+  template:
+    src: centos/etc_init.d_redis.j2
+    dest: /etc/init.d/redis_{{ redis_port }}
+    mode: 0755
+
+- name: Enable redis service
+  service:
+    name: redis_{{ redis_port }}
+    enabled: yes

@@ -1,9 +1,9 @@
 ---
 
-- name: Install Debian based essential softwares
+- name: Install build-essential Ubuntu
   include: debian.yml
-  when: ansible_pkg_mgr == "apt" and (ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian')
+  when: ansible_distribution == 'Ubuntu'
 
-- name: Install RedHat based essential softwares
+- name: Install build-essential CentOS
   include: redhat.yml
-  when: ansible_pkg_mgr == "yum" and ansible_os_family == "RedHat"
+  when: ansible_distribution == "CentOS"
