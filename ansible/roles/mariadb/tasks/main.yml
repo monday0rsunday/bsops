@@ -1,0 +1,45 @@
+---
+# see https://mariadb.com/kb/en/mariadb/yum/
+# TODO: setup mysql password using Expect
+# see: https://gist.github.com/Mins/4602864
+- block:
+  - name: Add MariaDB repo
+    template:
+      src: centos/etc_yum.repos.d_MariaDB.repo.j2
+      dest: /etc/yum.repos.d/MariaDB.repo
+
+  - name: Install MariaDB
+    yum:
+      name: '{{ item }}'
+      state: present
+      update_cache: yes
+    with_items:
+      - MariaDB-server
+      - MariaDB-client
+    when: not((({{ mariadb_version | regex_replace('\..*$','') | int }} < 10) or ( mariadb_version == '10.0')) and (enable_galera == True))
+
+  - name: Install MariaDB(<10.0) with Galera
+    yum:
+      name: '{{ item }}'
+      state: present
+    with_items:
+      - MariaDB-server
+      - MariaDB-client
+      - galera
+    when:
+      - enable_galera == True
+      - ({{ mariadb_version | regex_replace('\..*$','') | int }} < 10)
+
+  - name: Install MariaDB(10.0) with Galera
+    yum:
+      name: '{{ item }}'
+      state: present
+    with_items:
+      - MariaDB-Galera-server
+      - MariaDB-client
+      - galera
+    when:
+      - enable_galera == True
+      - ( mariadb_version == '10.0')
+
+  when: ansible_distribution == 'CentOS'

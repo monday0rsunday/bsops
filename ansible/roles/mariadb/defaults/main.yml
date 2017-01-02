@@ -1,0 +1,4 @@
+---
+
+mariadb_version: '10.1'
+enable_galera: True

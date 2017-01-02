@@ -1,0 +1,12 @@
+---
+- name: Test mariadb role
+  hosts: vagrant
+  become: true
+  become_method: sudo
+
+  roles:
+    - mariadb
+
+  vars:
+    mariadb_version: '5.5'
+    enable_galera: True
