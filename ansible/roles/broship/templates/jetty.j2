@@ -1,0 +1,82 @@
+#!/bin/bash
+if [[ "$CUR_HOME" -eq "" ]]; then
+        export CUR_HOME=$(dirname $(dirname $(readlink -f $0)))
+fi
+
+running()
+{
+  if [ -f "$1" ]
+  then
+    local PID=$(cat "$1" 2>/dev/null) || return 1
+    kill -0 "$PID" 2>/dev/null
+    return
+  fi
+  rm -f "$1"
+  return 1
+}
+
+export BSAUTH_HOME=/oreka/prod/bsauth
+export BSAUTH_CONF=$BSAUTH_HOME/conf
+export BSPUSH_HOME=/oreka/prod/bspush
+export BSPUSH_CONF=$BSPUSH_HOME/conf
+export BSSOCIAL_HOME=/oreka/prod/bssocial-search
+export BSSOCIAL_CONF=$BSSOCIAL_HOME/conf
+
+JETTY_PORT=8995
+JETTY_HOME=$CUR_HOME/server
+JETTY_BASE=$JETTY_HOME
+
+JETTY_USER=jetty
+JETTY_GROUP=jetty
+STD_REDIRECT_FILE=$CUR_HOME/log/jetty_${JETTY_PORT}.log
+JVM_OPTS="-server -Xms1g -Xmx1g -Duser.country=VN -Duser.language=vi"
+BS_OPTS="-Dbsauth.home=$BSAUTH_HOME -Dbsauth.conf=$BSAUTH_CONF -Dbspush.home=$BSPUSH_HOME -Dbspush.conf=$BSPUSH_CONF -Dbssocial.home=$BSSOCIAL_HOME -Dbssocial.conf=$BSSOCIAL_CONF"
+JETTY_OPTS="-Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE -Djetty.http.port=$JETTY_PORT"
+JETTY_PID=$CUR_HOME/jetty_${JETTY_PORT}.pid
+
+case $1 in
+  start)
+                if running $JETTY_PID ; then
+                        echo "Already Running $(cat $JETTY_PID)!"
+                        exit 1
+                fi
+                touch $JETTY_PID
+                chown ${JETTY_USER}.${JETTY_GROUP} $JETTY_PID
+    STD_DIR=$(dirname $STD_REDIRECT_FILE)
+    if [ ! -d ${STD_DIR} ]; then
+      mkdir -p ${STD_DIR}
+    fi
+                touch $STD_REDIRECT_FILE
+                chown ${JETTY_USER}.${JETTY_GROUP} $STD_REDIRECT_FILE
+                su $JETTY_USER -s "/bin/bash" -c "java $JVM_OPTS $BS_OPTS $JETTY_OPTS -jar $JETTY_HOME/start.jar > $STD_REDIRECT_FILE 2>&1 &
+                        disown \$!
+                        echo \$! > '$JETTY_PID'
+                "
+    echo "bs service started"
+  ;;
+  stop)
+                if [ ! -f "$JETTY_PID" ] ; then
+                        echo "ERROR: no pid found at $JETTY_PID"
+                        exit 1
+                fi
+                PID=$(cat "$JETTY_PID" 2>/dev/null)
+                if [ -z "$PID" ] ; then
+                        echo "ERROR: no pid id found in $JETTY_PID"
+                        exit 1
+                fi
+                kill "$PID" 2>/dev/null
+
+                TIMEOUT=30
+                while running $JETTY_PID; do
+                        if (( TIMEOUT-- == 0 )); then
+                                kill -KILL "$PID" 2>/dev/null
+                        fi
+                        sleep 1
+                done
+    rm -f $JETTY_PID
+    echo "bs service stopped"
+  ;;
+  *)
+    echo "Unknown command, usage: $0 start|stop"
+  ;;
+esac

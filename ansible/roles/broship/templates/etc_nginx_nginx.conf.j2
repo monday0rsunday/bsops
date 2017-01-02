@@ -1,0 +1,583 @@
+user  nginx;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+    server {
+        listen      80;
+        server_name plan.anyquiz.info;
+        gzip off;
+        return  301 https://$server_name$request_uri;
+    }
+    server {
+        listen      80;
+        server_name docs.anyquiz.info;
+        gzip off;
+        return  301 https://$server_name$request_uri;
+    }
+    server {
+        listen      80;
+        server_name admin.abacsi.com.vn;
+        return  301 https://$server_name$request_uri;
+    }
+
+    server {
+        listen       80;
+        server_name  git.anyquiz.info;
+        return  301 https://$server_name$request_uri;
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+
+        #location / {
+        #    root   html;
+        #    index  index.html index.htm;
+        #}
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        #error_page   500 502 503 504  /50x.html;
+        #location = /50x.html {
+        #    root   html;
+        #}
+
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://127.0.0.1;
+        #}
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        #location ~ \.php$ {
+        #    root           html;
+        #    fastcgi_pass   127.0.0.1:9000;
+        #    fastcgi_index  index.php;
+        #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+        #    include        fastcgi_params;
+        #}
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+    }
+
+    # another virtual host using mix of IP-, name-, and port-based configuration
+    #
+    #server {
+    #    listen       8000;
+    #    listen       somename:8080;
+    #    server_name  somename  alias  another.alias;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+
+    # HTTPS server
+    #
+    server {
+        listen       443 ssl;
+        server_name  git.anyquiz.info;
+
+        ssl_certificate      /oreka/ca/anyquiz.crt;
+        ssl_certificate_key  /oreka/ca/anyquiz.key;
+
+        ssl_session_cache    shared:SSL:1m;
+        ssl_session_timeout  5m;
+
+        include proxy.include;
+        proxy_redirect off;
+
+    #    ssl_ciphers  HIGH:!aNULL:!MD5;
+    #    ssl_prefer_server_ciphers  on;
+
+        location / {
+    #        root   html;
+    #        index  index.html index.htm;
+            proxy_pass http://127.0.0.1:8080;
+        }
+    }
+
+    server {
+        listen       443 ssl;
+        server_name  docs.anyquiz.info;
+        gzip off;
+        
+        ssl_certificate      /oreka/ca/anyquiz.crt;
+        ssl_certificate_key  /oreka/ca/anyquiz.key;
+
+        ssl_session_cache    shared:SSL:1m;
+        ssl_session_timeout  5m;
+
+        include proxy.include;
+        proxy_redirect off;
+
+        location / {
+           proxy_pass http://127.0.0.1:8091;
+        }
+        location /swagger-ui {
+            root /oreka;
+            index index.html;
+        }
+        location /swagger-editor {
+            root /oreka;
+            index index.html;
+        }
+        location /swagger-res {
+            root /oreka;
+        }
+    }
+
+    server {
+        listen       443 ssl;
+        server_name  plan.anyquiz.info;
+        
+        gzip off;
+        ssl_certificate      /oreka/ca/anyquiz.crt;
+        ssl_certificate_key  /oreka/ca/anyquiz.key;
+
+        ssl_session_cache    shared:SSL:1m;
+        ssl_session_timeout  5m;
+
+        include proxy.include;
+        proxy_redirect off;
+
+        location / {
+           proxy_pass http://127.0.0.1:8090;
+        }
+   }
+    server {
+        listen  80;
+        server_name browser.anyquiz.info;
+        include proxy.include;
+        proxy_redirect off;
+        location / {
+                 proxy_pass http://127.0.0.1:8889;
+        }
+    }
+    server {
+        listen       443 ssl;
+        server_name  browser.anyquiz.info;
+        gzip off;
+
+        ssl_certificate      /oreka/sslforfree_browser_anyquiz/certificate.crt;
+        ssl_certificate_key  /oreka/sslforfree_browser_anyquiz/private.key;
+
+        ssl_session_cache    shared:SSL:1m;
+        ssl_session_timeout  5m;
+        root /oreka/www/fb/public/;
+        index index.php;
+        location ~ \.php$ {
+                try_files $uri =404;
+                fastcgi_pass 127.0.0.1:9000;
+                fastcgi_index index.php;
+                fastcgi_param  REQUEST_URI $request_url;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                include fastcgi_params;
+
+        }
+    }
+    server {
+        listen  80;
+        server_name     english.anyquiz.info;
+        include proxy.include;
+        proxy_redirect off;
+        location / {
+           proxy_pass   http://127.0.0.1:6081;
+        }
+    }
+    server {
+        listen 80;
+        server_name      api.anyquiz.info;
+        include proxy.include;
+        proxy_redirect off;
+        location / {
+            proxy_pass   http://127.0.0.1:8888;
+        }
+
+        location /sodeep/v0/ {
+           rewrite ^/sodeep/v0/(.*) /$1 break;
+           proxy_pass   http://127.0.0.1:8089;
+        }
+
+        location /auth/v0/ {
+           #rewrite ^/auth/v0/(.*) /$1 break;
+           #proxy_pass   http://127.0.0.1:8890;
+           proxy_pass   http://127.0.0.1:8895;
+        }
+        location /social/v0/ {
+            rewrite ^/social/v0/(.*) /v0.1/$1 break;
+            proxy_pass   http://127.0.0.1:8891;
+        }
+        location /social/v0/search {
+            #rewrite ^/social/v0/search/(.*) /$1 break;
+            #proxy_pass   http://127.0.0.1:8892;
+            proxy_pass   http://127.0.0.1:8895;
+        }
+        location /social/v0/admin {
+            rewrite ^/social/v0/admin/(.*) /v0.1/$1 break;
+            proxy_pass   http://127.0.0.1:8894;
+        }
+        location /push/v0/ {
+            #rewrite ^/push/v0/(.*) /$1 break;
+            #proxy_pass http://127.0.0.1:8893;
+            proxy_pass http://127.0.0.1:8895;
+        }
+
+
+        location /static {
+            root /oreka;
+        }
+    
+    server {
+        listen       80;
+        server_name  id.anyquiz.info;
+
+        include proxy.include;
+        proxy_redirect off;
+
+        location / {
+            #proxy_pass http://127.0.0.1:8890;
+            rewrite ^/(.*) /auth/v0/$1 break;
+            proxy_pass http://127.0.0.1:8895;
+        }
+    }
+    server {
+        listen       443 ssl;
+        server_name  id.anyquiz.info;
+
+        ssl_certificate      /oreka/ca/anyquiz.crt;
+        ssl_certificate_key  /oreka/ca/anyquiz.key;
+
+        ssl_session_cache    shared:SSL:1m;
+        ssl_session_timeout  5m;
+
+        include proxy.include;
+        proxy_redirect off;
+
+        location / {
+            #proxy_pass http://127.0.0.1:8890;
+            rewrite ^/(.*) /auth/v0/$1 break;
+            proxy_pass http://127.0.0.1:8895;
+        }
+    }
+    ## ABACSI API
+    server {
+        listen 80;
+        server_name      api.abacsi.com.vn;
+        include proxy.include;
+        proxy_redirect off;
+        location / {
+            proxy_pass   http://127.0.0.1:8988;
+        }
+
+        location /auth/v0/ {
+            #rewrite ^/auth/v0/(.*) /$1 break;
+            #proxy_pass   http://127.0.0.1:8990;
+            # new
+            proxy_pass   http://127.0.0.1:8995;
+        }
+        location /social/v0/ {
+            rewrite ^/social/v0/(.*) /v0.1/$1 break;
+            proxy_pass   http://127.0.0.1:8991;
+        }
+        location /social/v0/search {
+            #rewrite ^/social/v0/search/(.*) /$1 break;
+            #proxy_pass   http://127.0.0.1:8992;
+            # new
+            proxy_pass   http://127.0.0.1:8995;
+        }
+        location /social/v0/admin {
+            rewrite ^/social/v0/admin/(.*) /v0.1/$1 break;
+            proxy_pass   http://127.0.0.1:8994;
+        }
+        location /push/v0/ {
+            #rewrite ^/push/v0/(.*) /$1 break;
+            #proxy_pass http://127.0.0.1:8993;
+            # new
+            proxy_pass http://127.0.0.1:8995;
+        }
+
+        location /static {
+            root /oreka;
+        }
+    }
+    server {
+        listen       80;
+        server_name  id.abacsi.com.vn;
+
+        include proxy.include;
+        proxy_redirect off;
+
+        location / {
+            #proxy_pass http://127.0.0.1:8990;
+            # new
+            rewrite ^/(.*) /auth/v0/$1 break;
+            proxy_pass http://127.0.0.1:8995;
+        }
+    }
+    server {
+        listen       443 ssl;
+        server_name  id.abacsi.com.vn;
+
+        ssl_certificate      /oreka/ca/anyquiz.crt;
+        ssl_certificate_key  /oreka/ca/anyquiz.key;
+
+        ssl_session_cache    shared:SSL:1m;
+        ssl_session_timeout  5m;
+
+        include proxy.include;
+        proxy_redirect off;
+
+        location / {
+            #proxy_pass http://127.0.0.1:8990;
+            # new
+            rewrite ^/(.*) /auth/v0/$1 break;
+            proxy_pass http://127.0.0.1:8995;
+        }
+    }
+    ############
+    server {
+        listen 80;
+        server_name config.anyquiz.info;
+        root /oreka/config;
+  
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+            root html;
+        }
+    }
+
+    server {
+        listen 80;
+        server_name     anyquiz.info;
+    }
+
+    server {
+        listen 80;
+        server_name abacsi.com.vn;
+        access_log logs/abacsi_access.log;
+        error_log logs/abacsi_error.log debug;
+        #root /oreka/www/landing;
+        #index   index.php; 
+
+        #error_page 500 502 503 504 /50x.html;
+        #location = /50x.html {
+        #      root html;
+        #}
+        include proxy.include;
+        proxy_redirect off;
+        root /oreka/www/news/public;
+        index index.php;
+  
+        set $request_url $request_uri;
+
+        location / {
+            try_files $uri $uri/ /index.php?$args;
+        }
+
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+            root html;
+        }
+        #
+        location ~ \.php$ {
+            try_files $uri =404;
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+            fastcgi_param  REQUEST_URI $request_url;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+        }
+    }
+
+    server {
+        listen      80;
+        server_name www.babymom.biz;
+        return  301 http://babymom.biz$request_uri;
+    }
+
+    server {
+        listen 80;
+        server_name babymom.biz;
+        access_log logs/abacsi_access.log;
+        error_log logs/abacsi_error.log debug;
+        #root /oreka/www/landing;
+        #index   index.php; 
+
+        #error_page 500 502 503 504 /50x.html;
+        #location = /50x.html {
+        #      root html;
+        #}
+        include proxy.include;
+        proxy_redirect off;
+        root /oreka/www/news/public;
+        index index.php;
+  
+        set $request_url $request_uri;
+
+        location / {
+            try_files $uri $uri/ /index.php?$args;
+        }
+
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+            root html;
+        }
+        #
+        location ~ \.php$ {
+            try_files $uri =404;
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+            fastcgi_param  REQUEST_URI $request_url;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+        }
+    }
+
+    server {
+        listen 443;
+        server_name admin.abacsi.com.vn;
+        ssl_certificate      /oreka/ca/anyquiz.crt;
+        ssl_certificate_key  /oreka/ca/anyquiz.key;
+
+        ssl_session_cache    shared:SSL:1m;
+        ssl_session_timeout  5m;
+
+        include proxy.include;
+        proxy_redirect off;
+        access_log logs/abacsi_access.log;
+        error_log logs/abacsi_error.log debug;
+        root    /oreka/www/admin/public;
+        index index.php;
+  
+        set $request_url $request_uri;
+  
+        location / {
+            try_files $uri $uri/ /index.php?$args;
+        } 
+
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+            root html;
+        }
+        # pass the PHP scripts to FastCGI server listening on the php-fpm socket
+        location ~ \.php$ {
+            try_files $uri =404;
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+            fastcgi_param  REQUEST_URI $request_url;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+        }
+    }
+
+    server {
+        listen      80;
+        server_name admin.babymom.biz;
+        return  301 https://$server_name$request_uri;
+    }
+
+    server {
+        listen 443;
+        server_name admin.babymom.biz;
+        ssl_certificate      /oreka/ca/anyquiz.crt;
+        ssl_certificate_key  /oreka/ca/anyquiz.key;
+
+        ssl_session_cache    shared:SSL:1m;
+        ssl_session_timeout  5m;
+
+        indexnclude proxy.include;
+        proxy_redirect off;
+        access_log logs/abacsi_access.log;
+        error_log logs/abacsi_error.log debug;
+        root    /oreka/www/admin/public;
+        index index.php;
+  
+        set $request_url $request_uri;
+  
+        location / {
+            try_files $uri $uri/ /index.php?$args;
+        } 
+
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+            root html;
+        }
+        # pass the PHP scripts to FastCGI server listening on the php-fpm socket
+        location ~ \.php$ {
+            try_files $uri =404;
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+            fastcgi_param  REQUEST_URI $request_url;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+        }
+    }
+
+    ## Admin dev
+    server {
+        listen 80;
+        server_name admin.anyquiz.info;
+        access_log logs/anyquiz_access.log;
+        error_log logs/anyquiz_error.log debug;
+        root    /oreka/www/admin_dev/public;
+        index index.php;
+        
+        set $request_url $request_uri;
+        
+        location / {
+            try_files $uri $uri/ /index.php?$args;
+        } 
+
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+            root html;
+        }
+        # pass the PHP scripts to FastCGI server listening on the php-fpm socket
+        location ~ \.php$ {
+            try_files $uri =404;
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+            fastcgi_param  REQUEST_URI $request_url;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params; 
+        }
+    }
+}
