@@ -4,3 +4,6 @@ centos7 ansible_host=192.168.100.102 ansible_port=22 ansible_user=vagrant ansibl
 
 [backend]
 centos7 ansible_host=192.168.100.102 ansible_port=22 ansible_user=vagrant ansible_ssh_pass=vagrant
+
+[frontend]
+centos7 ansible_host=192.168.100.102 ansible_port=22 ansible_user=vagrant ansible_ssh_pass=vagrant

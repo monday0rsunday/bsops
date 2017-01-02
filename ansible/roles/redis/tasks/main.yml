@@ -13,21 +13,28 @@
 
 - name: Check redis
   stat:
-    path: '{{ redis_home }}/bin/redis-server'
+    path: "{{ redis_home }}/bin/redis-server"
   register: redis
 
 - name: Unarchive redis
-  unarchive:
+  get_url:
     src: http://download.redis.io/releases/redis-{{ redis_version }}.tar.gz
-    dest: '{{ redis_build_dir }}'
+    dest: "{{ redis_cache_dir }}/redis-{{ redis_version }}.tar.gz"
+    creates: "{{ redis_cache_dir }}/redis-{{ redis_version }}.tar.gz"
+  when: redis.stat.exists == False
+
+- name: Unarchive redis
+  unarchive:
+    src: "{{ redis_cache_dir }}/redis-{{ redis_version }}.tar.gz"
+    dest: "{{ redis_cache_dir }}"
     copy: no
-    creates: "{{ redis_build_dir }}/redis-{{ redis_version}}"
+    creates: "{{ redis_cache_dir }}/redis-{{ redis_version}}"
   when: redis.stat.exists == False
 
 - name: Build redis
   shell: make distclean && make
   args:
-    chdir: '{{ redis_build_dir }}/redis-{{ redis_version}}'
+    chdir: "{{ redis_cache_dir }}/redis-{{ redis_version}}"
   when: redis.stat.exists == False
 
 - name: Install TCL for testing redis
@@ -36,15 +43,15 @@
     state: present
 
 # - name: Test redis
-#   shell: cd {{ redis_build_dir }}/redis-{{ redis_version|default('3.2.6')}} && make test
+#   shell: cd {{ redis_cache_dir }}/redis-{{ redis_version|default('3.2.6')}} && make test
 
 - name: Install redis
-  shell: cd {{ redis_build_dir }}/redis-{{ redis_version}} && make PREFIX={{ redis_home }} install
+  shell: cd {{ redis_cache_dir }}/redis-{{ redis_version}} && make PREFIX={{ redis_home }} install
   when: redis.stat.exists == False
 
 - name: Create redis conf directory
   file:
-    path: '{{ item }}'
+    path: "{{ item }}"
     state: directory
     owner: root
     group: root
@@ -54,10 +61,10 @@
 
 - name: Create redis data directories
   file:
-    path: '{{ item }}'
+    path: "{{ item }}"
     state: directory
-    owner: '{{ redis_user }}'
-    group: '{{ redis_group }}'
+    owner: "{{ redis_user }}"
+    group: "{{ redis_group }}"
     mode: 0755
   with_items:
     - '{{ redis_data_dir }}'
@@ -67,7 +74,7 @@
 - name: Configure redis
   template:
     src: redis.conf.j2
-    dest: '{{ redis_conf_dir }}/redis_{{ redis_port }}.conf'
+    dest: "{{ redis_conf_dir }}/redis_{{ redis_port }}.conf"
     mode: 0644
 
 - name: Create redis startup script

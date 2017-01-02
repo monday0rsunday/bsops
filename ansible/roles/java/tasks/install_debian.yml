@@ -2,20 +2,20 @@
 # see https://www.digitalocean.com/community/tutorials/how-to-manually-install-oracle-java-on-a-debian-or-ubuntu-vps
 
 - name: Check downloaded JDK
-  stat: path=/tmp/jdk-{{ jdk_version }}-linux-x64.tar.gz
+  stat: path={{ jdk_cache_dir }}/jdk-{{ jdk_version }}-linux-x64.tar.gz
   register: jdk_downloaded
 
 - name: Download JDK
   get_url:
     url: http://download.oracle.com/otn-pub/java/jdk/{{ jdk_version }}-{{ jdk_build_version }}/jdk-{{ jdk_version }}-linux-x64.tar.gz
-    dest: /tmp/jdk-{{ jdk_version }}-linux-x64.tar.gz
-    headers: 'Cookie: oraclelicense=accept-securebackup-cookie'
+    dest: "{{ jdk_cache_dir }}/jdk-{{ jdk_version }}-linux-x64.tar.gz"
+    headers: "Cookie: oraclelicense=accept-securebackup-cookie"
   when: not jdk_downloaded.stat.exists
 
 - name: Extract JDK
-  shell: tar -zxvf /tmp/jdk-{{ jdk_version }}-linux-x64.tar.gz -C /opt/
+  shell: tar -zxvf {{ jdk_cache_dir }}/jdk-{{ jdk_version }}-linux-x64.tar.gz -C {{ jdk_dir }}
   args:
-    removes: "/tmp/jdk-{{ jdk_version }}-linux-x64.tar.gz"
+    removes: "{{ jdk_cache_dir }}/jdk-{{ jdk_version }}-linux-x64.tar.gz"
 
 - name: Link JDK
-  shell: update-alternatives --install /usr/bin/java java /opt/jdk{{ jdk_full_version }}/bin/java 10000
+  shell: update-alternatives --install /usr/bin/java java {{ jdk_dir }}/jdk{{ jdk_full_version }}/bin/java 10000

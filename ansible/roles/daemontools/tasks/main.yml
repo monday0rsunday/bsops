@@ -20,8 +20,8 @@
 - name: Fix daemontools building problem, see http://jamesreubenknowles.com/centos5-daemontools-143
   replace:
     dest: /tmp/admin/daemontools-{{ daemontools_version }}/src/conf-cc
-    regexp: '^(gcc.*)$'
-    replace: '\1 -include /usr/include/errno.h'
+    regexp: "^(gcc.*)$"
+    replace: "\\1 -include /usr/include/errno.h"
 
 - name: Copy daemontools to persistent directory
   # I don't known why it doesn't work

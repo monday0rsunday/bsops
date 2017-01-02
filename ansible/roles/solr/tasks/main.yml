@@ -15,23 +15,23 @@
   user: name="{{ solr_user }}" uid="{{ solr_uid }}" group="{{ solr_group }}" shell=/bin/bash state=present
 
 - name: Check Solr downloaded
-  stat: path=/tmp/solr-{{ solr_version }}.zip
+  stat: path={{ solr_cache_dir }}/solr-{{ solr_version }}.zip
   register: solr_downloaded
 
 - name: Download Solr
   get_url:
     url: http://archive.apache.org/dist/lucene/solr/{{ solr_version }}/solr-{{ solr_version }}.zip
-    dest: /tmp/solr-{{ solr_version }}.zip
+    dest: "{{ solr_cache_dir }}/solr-{{ solr_version }}.zip"
   when: not solr_downloaded.stat.exists
 
 - name: Ensure unzip installed
   package: name=unzip state=present
 
 - name: Extract Solr
-  # unarchive: remote_src=yes src="/tmp/solr-{{ solr_version }}.zip" dest="{{ solr_dir }}" owner={{ solr_user }} group={{ solr_group }}
-  shell: unzip /tmp/solr-{{ solr_version }}.zip -d {{ solr_dir }} && chown -R {{ solr_user }}.{{ solr_group }} {{ solr_dir }}/solr-{{ solr_version }}
+  # unarchive: remote_src=yes src="{{ solr_cache_dir }}/solr-{{ solr_version }}.zip" dest="{{ solr_dir }}" owner={{ solr_user }} group={{ solr_group }}
+  shell: unzip {{ solr_cache_dir }}/solr-{{ solr_version }}.zip -d {{ solr_dir }} && chown -R {{ solr_user }}.{{ solr_group }} {{ solr_dir }}/solr-{{ solr_version }}
   args:
-    removes: "/tmp/solr-{{ solr_version }}.zip"
+    removes: "{{ solr_cache_dir }}/solr-{{ solr_version }}.zip"
     creates: "{{ solr_dir }}/solr-{{ solr_version }}"
 
 - name: Link Solr

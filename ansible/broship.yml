@@ -1,19 +1,66 @@
 ---
 - name: Setup Broship infrastructure
-  hosts: all
+  hosts: frontend
   become: true
   become_method: sudo
   vars:
-    zk_data_dir: /var/lib/zookeeper
-    zk_port: 2181
+    - nginx_version: 1.8.1
+    - nginx_dir: /usr/local
+  roles:
+    - build-essential
+    - {role: daemontools, daemontools_version: 0.76}
+    - nginx
+
+- name: Setup Broship infrastructure
+  hosts: backend
+  become: true
+  become_method: sudo
+  vars:
+    - jdk_version: 8u112
+    - jdk_build_version: b15
+    - jdk_full_version: 1.8.0_112
+    - jdk_dir: /usr/local
+    
+    - zk_version: 3.4.8
+    - zk_dir: /usr/local
+    - zk_uid: 2002
+    - zk_gid: 2002
+    - zk_user: zookeeper
+    - zk_group: zookeeper
+    - zk_data_dir: /var/lib/zookeeper
+    - zk_port: 2181
+
+    - solr_version: 6.0.0
+    - solr_dir: /usr/local
+    - solr_uid: 2001
+    - solr_gid: 2001
+    - solr_user: solr
+    - solr_group: solr
+
+    - jetty_version: 9.3.13.v20161014
+    - jetty_dir: /usr/local
+    - jetty_uid: 2004
+    - jetty_gid: 2004
+    - jetty_user: jetty
+    - jetty_group: jetty
+    
+    - rbmq_version: 3.6.2
+    - rbmq_dir: /usr/local
+    - rbmq_uid: 2003
+    - rbmq_gid: 2003
+    - rbmq_user: rabbitmq
+    - rbmq_group: rabbitmq
+
+    - mariadb_version: 10.0
+    - enable_galera: True
   roles:
     - build-essential
     - {role: daemontools, daemontools_version: 0.76}
     - {role: erlang, erlang_version: 18.3.4-1}
-    - {role: java, jdk_version: 8u112, jdk_build_version: b15, jdk_full_version: 1.8.0_112, jdk_dir: /usr/local}
-    - {role: zookeeper, zk_version: 3.4.8, zk_dir: /usr/local, zk_uid: 2002, zk_gid: 2002, zk_user: zookeeper, zk_group: zookeeper}
-    - {role: solr, solr_version: 6.0.0, solr_dir: /usr/local, solr_uid: 2001, solr_gid: 2001, solr_user: solr, solr_group: solr}
+    - {role: java}
+    - {role: zookeeper}
+    - {role: solr}
     - {role: riak-kv}
-    - {role: jetty, jetty_version: 9.3.13.v20161014, jetty_dir: /usr/local, jetty_uid: 2004, jetty_gid: 2004, jetty_user: jetty, jetty_group: jetty}
-    - {role: nginx, nginx_version: 1.8.1, nginx_dir: /usr/local}
-    - {role: rabbitmq, rbmq_version: 3.6.2, rbmq_dir: /usr/local, rbmq_uid: 2003, rbmq_gid: 2003, rbmq_user: rabbitmq, rbmq_group: rabbitmq}
+    - {role: jetty}
+    - {role: rabbitmq}
+    - mariadb

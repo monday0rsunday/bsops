@@ -6,3 +6,4 @@ zk_uid: 2002
 zk_gid: 2002
 zk_user: zookeeper
 zk_group: zookeeper
+zk_cache_dir: /tmp

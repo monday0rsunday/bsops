@@ -7,6 +7,3 @@
   rpm_key:
     key: https://nginx.org/keys/nginx_signing.key
     state: present
-
-- name: Update package manager - RedHat based distro
-  shell: yum update

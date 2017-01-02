@@ -6,3 +6,4 @@ rbmq_uid: 2003
 rbmq_gid: 2003
 rbmq_user: rabbitmq
 rbmq_group: rabbitmq
+rbmq_cache_dir: /tmp

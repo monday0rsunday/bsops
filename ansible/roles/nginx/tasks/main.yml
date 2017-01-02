@@ -3,11 +3,13 @@
 # Startup script: https://www.nginx.com/resources/wiki/start/topics/examples/redhatnginxinit/
 - name: Update repositories - Debian based distro
   include: update_debian.yml
+  static: no
   when: ansible_pkg_mgr == "apt" and (ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian')
 
 - name: Update repositories - Redhat based distro
   include: update_redhat.yml
+  static: no
   when: ansible_pkg_mgr == "yum" and ansible_os_family == "RedHat"
 
 - name: Install nginx
-  package: name=nginx state=latest
+  package: name=nginx state=latest update_cache=yes

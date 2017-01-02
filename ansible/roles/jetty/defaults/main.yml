@@ -6,3 +6,4 @@ jetty_group: jetty
 jetty_gid: 2004
 jetty_version: 9.3.13.v20161014
 jetty_dir: /usr/local
+jetty_cache_dir: /tmp

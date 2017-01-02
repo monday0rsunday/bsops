@@ -10,7 +10,7 @@
 
   - name: Install MariaDB
     yum:
-      name: '{{ item }}'
+      name: "{{ item }}"
       state: present
       update_cache: yes
     with_items:
@@ -20,7 +20,7 @@
 
   - name: Install MariaDB(<10.0) with Galera
     yum:
-      name: '{{ item }}'
+      name: "{{ item }}"
       state: present
     with_items:
       - MariaDB-server
@@ -32,7 +32,7 @@
 
   - name: Install MariaDB(10.0) with Galera
     yum:
-      name: '{{ item }}'
+      name: "{{ item }}"
       state: present
     with_items:
       - MariaDB-Galera-server

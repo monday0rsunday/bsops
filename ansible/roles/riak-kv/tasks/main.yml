@@ -3,6 +3,7 @@
 
 - name: Install Riak Ubuntu
   include: install_ubuntu_trusty.yml
+  static: no
   when:
     - ansible_distribution == 'Ubuntu'
     - ansible_distribution_release == 'trusty'
@@ -10,5 +11,6 @@
 
 - name: Download Riak CentOS
   include: install_centos.yml
+  static: no
   when:
     - ansible_distribution == 'CentOS'

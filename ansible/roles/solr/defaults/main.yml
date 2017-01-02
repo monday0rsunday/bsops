@@ -6,3 +6,4 @@ solr_uid: 2001
 solr_gid: 2001
 solr_user: solr
 solr_group: solr
+solr_cache_dir: /tmp
